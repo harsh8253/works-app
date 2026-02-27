@@ -184,6 +184,7 @@ export default function TaskListScreen() {
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.primary }]}
         activeOpacity={0.85}
+        onPress={() => router.push("/add-task" as any)}
       >
         <Ionicons name="add" size={24} color="#FFFFFF" />
       </TouchableOpacity>

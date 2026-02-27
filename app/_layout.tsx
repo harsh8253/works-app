@@ -20,6 +20,14 @@ export default function RootLayout() {
             animation: "slide_from_right",
           }}
         />
+        <Stack.Screen
+          name="add-task"
+          options={{
+            headerShown: false,
+            animation: "slide_from_bottom",
+            presentation: "modal",
+          }}
+        />
       </Stack>
       <StatusBar style="light" />
     </>
