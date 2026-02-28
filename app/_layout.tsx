@@ -1,3 +1,4 @@
+import { ThemeProvider, useTheme } from "@/constants/ThemeContext";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
@@ -6,7 +7,9 @@ export const unstable_settings = {
   initialRouteName: "splash",
 };
 
-export default function RootLayout() {
+function InnerLayout() {
+  const { isDark } = useTheme();
+
   return (
     <>
       <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
@@ -29,7 +32,15 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-      <StatusBar style="light" />
+      <StatusBar style={isDark ? "light" : "dark"} />
     </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <InnerLayout />
+    </ThemeProvider>
   );
 }

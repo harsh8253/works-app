@@ -1,23 +1,23 @@
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewStyle,
 } from "react-native";
 import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
 } from "react-native-reanimated";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -39,7 +39,7 @@ export default function SummaryCard({
   style,
   onPress,
 }: SummaryCardProps) {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({

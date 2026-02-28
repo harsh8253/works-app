@@ -1,29 +1,36 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
+import { auth } from "@/constants/firebase";
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import {
+    GoogleAuthProvider,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+} from "firebase/auth";
 import React, { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
@@ -31,8 +38,34 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    router.replace("/(tabs)" as any);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password.");
+      return;
+    }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.replace("/(tabs)" as any);
+    } catch (error: any) {
+      Alert.alert("Login Failed", error.message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (Platform.OS !== "web") {
+      Alert.alert(
+        "Platform Not Supported",
+        "Standard Google Sign-In via popup is currently only supported on Web in this setup."
+      );
+      return;
+    }
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.replace("/(tabs)" as any);
+    } catch (error: any) {
+      Alert.alert("Google Sign-In Failed", error.message);
+    }
   };
 
   return (
@@ -161,6 +194,7 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={[styles.socialButton, { borderColor: colors.border }]}
                 activeOpacity={0.7}
+                onPress={handleGoogleSignIn}
               >
                 <Ionicons
                   name="logo-google"
@@ -171,22 +205,6 @@ export default function LoginScreen() {
                   style={[styles.socialText, { color: colors.textSecondary }]}
                 >
                   Google
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.socialButton, { borderColor: colors.border }]}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name="logo-microsoft"
-                  size={18}
-                  color={colors.textSecondary}
-                />
-                <Text
-                  style={[styles.socialText, { color: colors.textSecondary }]}
-                >
-                  Microsoft
                 </Text>
               </TouchableOpacity>
             </View>

@@ -1,4 +1,5 @@
-import { Colors, FontWeight } from "@/constants/theme";
+import { FontWeight } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import React from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 
@@ -26,7 +27,7 @@ export default function AvatarGroup({
   size = 28,
   style,
 }: AvatarGroupProps) {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const displayAvatars = avatars.slice(0, maxDisplay);
   const remaining = avatars.length - maxDisplay;
 

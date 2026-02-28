@@ -1,19 +1,19 @@
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-  ViewStyle,
+    StyleSheet,
+    Text,
+    TextInput,
+    TextInputProps,
+    View,
+    ViewStyle,
 } from "react-native";
 
 interface CustomInputProps extends TextInputProps {
@@ -35,7 +35,7 @@ export default function CustomInput({
   ...props
 }: CustomInputProps) {
   const [focused, setFocused] = useState(false);
-  const colors = Colors.dark;
+  const { colors } = useTheme();
 
   return (
     <View style={[styles.container, containerStyle]}>

@@ -1,14 +1,17 @@
+import TaskActions from "@/components/TaskActions";
 import TaskCard from "@/components/TaskCard";
-import { currentSprint, tasks } from "@/constants/mockData";
+import { db } from "@/constants/firebase";
+import { Task } from "@/constants/mockData";
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { useRouter } from "expo-router";
-import React from "react";
+import { collection, onSnapshot, query } from "firebase/firestore";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,9 +29,37 @@ const columns: KanbanColumn[] = [
 ];
 
 export default function SprintBoardScreen() {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [actionTaskId, setActionTaskId] = useState<string | null>(null);
+  const [actionMode, setActionMode] = useState<"edit" | "assign" | "support" | null>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, "tasks"));
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedTasks = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Task)
+        );
+        fetchedTasks.sort((a: any, b: any) => (b.createdAt || 0) - (a.createdAt || 0));
+        setTasks(fetchedTasks);
+      },
+      (error) => {
+        console.error("Error fetching tasks:", error);
+      }
+    );
+    return unsub;
+  }, []);
+
+  const stats = useMemo(() => [
+    { label: "Total", value: tasks.length, color: colors.text },
+    { label: "Active", value: tasks.filter((t) => t.status === "in-progress").length, color: "#FBBF24" },
+    { label: "Done", value: tasks.filter((t) => t.status === "done").length, color: "#34D399" },
+  ], [tasks]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -42,7 +73,7 @@ export default function SprintBoardScreen() {
             Sprint Board
           </Text>
           <Text style={[styles.headerSubtitle, { color: colors.textMuted }]}>
-            {currentSprint.name}
+            {tasks.length} tasks across {columns.length} columns
           </Text>
         </View>
       </Animated.View>
@@ -52,23 +83,7 @@ export default function SprintBoardScreen() {
         entering={FadeIn.duration(400).delay(100)}
         style={[styles.statsRow]}
       >
-        {[
-          {
-            label: "Total",
-            value: currentSprint.totalTasks,
-            color: colors.text,
-          },
-          {
-            label: "Active",
-            value: tasks.filter((t) => t.status === "in-progress").length,
-            color: "#FBBF24",
-          },
-          {
-            label: "Done",
-            value: currentSprint.completedTasks,
-            color: "#34D399",
-          },
-        ].map((stat, i) => (
+        {stats.map((stat) => (
           <View key={stat.label} style={styles.stat}>
             <Text style={[styles.statValue, { color: stat.color }]}>
               {stat.value}
@@ -143,6 +158,9 @@ export default function SprintBoardScreen() {
                       onPress={() =>
                         router.push(`/task-detail?id=${task.id}` as any)
                       }
+                      onEdit={() => { setActionTaskId(task.id); setActionMode("edit"); }}
+                      onAssign={() => { setActionTaskId(task.id); setActionMode("assign"); }}
+                      onSupport={() => { setActionTaskId(task.id); setActionMode("support"); }}
                     />
                   ))
                 )}
@@ -151,6 +169,12 @@ export default function SprintBoardScreen() {
           );
         })}
       </ScrollView>
+
+      <TaskActions
+        taskId={actionTaskId}
+        mode={actionMode}
+        onClose={() => { setActionTaskId(null); setActionMode(null); }}
+      />
     </View>
   );
 }

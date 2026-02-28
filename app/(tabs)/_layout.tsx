@@ -1,10 +1,10 @@
-import { Colors } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
 export default function TabLayout() {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
 
   return (
     <Tabs

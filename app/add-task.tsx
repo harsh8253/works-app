@@ -1,15 +1,19 @@
 import CustomButton from "@/components/CustomButton";
+import { auth, db } from "@/constants/firebase";
 import {
   BorderRadius,
-  Colors,
   FontSize,
   FontWeight,
   Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { addDoc, collection } from "firebase/firestore";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -51,7 +55,7 @@ const teamMembers = [
 ];
 
 export default function AddTaskScreen() {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -62,6 +66,7 @@ export default function AddTaskScreen() {
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState("");
   const [tags, setTags] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleMember = (id: string) => {
     setSelectedMembers((prev) =>
@@ -71,9 +76,43 @@ export default function AddTaskScreen() {
 
   const isValid = title.trim().length > 0;
 
-  const handleCreate = () => {
-    // UI only — just navigate back
-    router.back();
+  const handleCreate = async () => {
+    if (!isValid) return;
+    setIsLoading(true);
+
+    try {
+      const selectedAssignees = teamMembers
+        .filter((member) => selectedMembers.includes(member.id))
+        .map((member) => ({
+          id: member.id,
+          name: member.name,
+          avatar: member.avatar,
+        }));
+
+      await addDoc(collection(db, "tasks"), {
+        title,
+        description,
+        priority,
+        status,
+        assignees: selectedAssignees,
+        dueDate: dueDate || "No date",
+        tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+        comments: [],
+        attachments: [],
+        createdAt: Date.now(),
+        createdBy: auth.currentUser?.uid || "anonymous",
+      });
+
+      router.back();
+      setTimeout(() => {
+        Alert.alert("✅ Success", "Task created successfully!");
+      }, 300);
+    } catch (error: any) {
+      console.error("Error creating task:", error);
+      Alert.alert("Error Creating Task", error.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -365,32 +404,6 @@ export default function AddTaskScreen() {
               </View>
             )}
           </Animated.View>
-
-          {/* Attachments placeholder */}
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(400)}
-            style={styles.fieldSection}
-          >
-            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>
-              Attachments
-            </Text>
-            <TouchableOpacity
-              style={[styles.attachmentDrop, { borderColor: colors.border }]}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="cloud-upload-outline"
-                size={24}
-                color={colors.textMuted}
-              />
-              <Text style={[styles.attachText, { color: colors.textTertiary }]}>
-                Tap to upload files
-              </Text>
-              <Text style={[styles.attachSub, { color: colors.textMuted }]}>
-                PDF, images, documents up to 25 MB
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -413,12 +426,18 @@ export default function AddTaskScreen() {
           style={{ flex: 1, marginRight: Spacing.sm }}
         />
         <CustomButton
-          title="Create Task"
+          title={isLoading ? "Creating..." : "Create Task"}
           variant="primary"
           onPress={handleCreate}
-          disabled={!isValid}
+          disabled={!isValid || isLoading}
           style={{ flex: 2 }}
-          icon={<Ionicons name="add" size={18} color="#FFFFFF" />}
+          icon={
+            isLoading ? (
+              <ActivityIndicator color={"#fff"} size="small" />
+            ) : (
+              <Ionicons name="add" size={18} color="#FFFFFF" />
+            )
+          }
         />
       </Animated.View>
     </View>
@@ -443,7 +462,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: Spacing.xl,
   },
-  // Title
   titleInput: {
     fontSize: FontSize.xxl,
     fontWeight: FontWeight.semibold,
@@ -452,7 +470,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: Spacing.md,
   },
-  // Description
   descInput: {
     fontSize: FontSize.md,
     lineHeight: 22,
@@ -461,7 +478,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xxl,
     minHeight: 80,
   },
-  // Field sections
   fieldSection: {
     marginBottom: Spacing.xxl,
   },
@@ -472,7 +488,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     marginBottom: Spacing.md,
   },
-  // Status & Priority chips
   optionRow: {
     flexDirection: "row",
     gap: Spacing.sm,
@@ -495,7 +510,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
   },
-  // Date
   dateInput: {
     flexDirection: "row",
     alignItems: "center",
@@ -509,7 +523,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSize.md,
   },
-  // Members
   membersGrid: {
     gap: Spacing.sm,
   },
@@ -539,7 +552,6 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     flex: 1,
   },
-  // Tags
   tagInput: {
     fontSize: FontSize.md,
     paddingHorizontal: Spacing.md,
@@ -562,24 +574,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     fontWeight: FontWeight.medium,
   },
-  // Attachments
-  attachmentDrop: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: Spacing.xxl,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    gap: Spacing.sm,
-  },
-  attachText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-  },
-  attachSub: {
-    fontSize: FontSize.xs,
-  },
-  // Bottom bar
   bottomBar: {
     position: "absolute",
     bottom: 0,

@@ -1,21 +1,25 @@
-import { currentUser } from "@/constants/mockData";
+import { auth, db } from "@/constants/firebase";
+import { Task } from "@/constants/mockData";
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { signOut } from "firebase/auth";
+import { collection, onSnapshot, query } from "firebase/firestore";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -41,22 +45,73 @@ type MenuSection = {
 };
 
 export default function ProfileScreen() {
-  const colors = Colors.dark;
+  const { colors, isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const user = auth.currentUser;
+  const userName = user?.displayName || user?.email?.split("@")[0] || "User";
+  const userEmail = user?.email || "No email";
+  const userInitials = userName.slice(0, 2).toUpperCase();
+
+  useEffect(() => {
+    const q = query(collection(db, "tasks"));
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetched = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Task)
+        );
+        setTasks(fetched);
+      },
+      (error) => {
+        console.error("Error fetching tasks:", error);
+      }
+    );
+    return unsub;
+  }, []);
+
+  const profileStats = useMemo(() => {
+    const total = tasks.length;
+    const done = tasks.filter((t) => t.status === "done").length;
+    const onTimePercent = total > 0 ? Math.round((done / total) * 100) : 0;
+    return [
+      { label: "Tasks", value: String(total) },
+      { label: "Done", value: String(done) },
+      { label: "Rate", value: `${onTimePercent}%` },
+    ];
+  }, [tasks]);
+
+  const handleLogout = async () => {
+    Alert.alert("Log Out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await signOut(auth);
+            router.replace("/login" as any);
+          } catch (error: any) {
+            Alert.alert("Error", error.message);
+          }
+        },
+      },
+    ]);
+  };
 
   const menuItems: MenuSection[] = [
     {
       section: "Preferences",
       items: [
         {
-          icon: "moon-outline",
+          icon: isDark ? "moon-outline" : "sunny-outline",
           label: "Dark Mode",
           type: "toggle" as const,
-          value: darkMode,
-          onToggle: setDarkMode,
+          value: isDark,
+          onToggle: () => toggleTheme(),
         },
         {
           icon: "notifications-outline",
@@ -114,13 +169,13 @@ export default function ProfileScreen() {
           style={styles.profileSection}
         >
           <View style={styles.avatarLarge}>
-            <Text style={styles.avatarLargeText}>{currentUser.avatar}</Text>
+            <Text style={styles.avatarLargeText}>{userInitials}</Text>
           </View>
           <Text style={[styles.profileName, { color: colors.text }]}>
-            {currentUser.name}
+            {userName}
           </Text>
           <Text style={[styles.profileRole, { color: colors.primaryLight }]}>
-            {currentUser.role}
+            Team Member
           </Text>
 
           <View style={styles.profileMeta}>
@@ -131,28 +186,14 @@ export default function ProfileScreen() {
                 color={colors.textMuted}
               />
               <Text style={[styles.metaText, { color: colors.textTertiary }]}>
-                {currentUser.email}
-              </Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Ionicons
-                name="people-outline"
-                size={14}
-                color={colors.textMuted}
-              />
-              <Text style={[styles.metaText, { color: colors.textTertiary }]}>
-                {currentUser.team}
+                {userEmail}
               </Text>
             </View>
           </View>
 
           {/* Stats */}
           <View style={styles.statsRow}>
-            {[
-              { label: "Tasks", value: "32" },
-              { label: "Sprints", value: "6" },
-              { label: "On Time", value: "94%" },
-            ].map((stat) => (
+            {profileStats.map((stat) => (
               <View key={stat.label} style={styles.stat}>
                 <Text style={[styles.statValue, { color: colors.text }]}>
                   {stat.value}
@@ -178,7 +219,7 @@ export default function ProfileScreen() {
             <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
               {section.section}
             </Text>
-            {section.items.map((item, iIndex) => (
+            {section.items.map((item) => (
               <TouchableOpacity
                 key={item.label}
                 style={styles.menuItem}
@@ -240,7 +281,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={[styles.logoutButton, { borderColor: colors.border }]}
             activeOpacity={0.6}
-            onPress={() => router.replace("/login" as any)}
+            onPress={handleLogout}
           >
             <Ionicons name="log-out-outline" size={18} color={colors.danger} />
             <Text style={[styles.logoutText, { color: colors.danger }]}>

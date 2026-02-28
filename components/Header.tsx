@@ -1,12 +1,13 @@
-import { Colors, FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewStyle,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -34,7 +35,7 @@ export default function Header({
   style,
 }: HeaderProps) {
   const insets = useSafeAreaInsets();
-  const colors = Colors.dark;
+  const { colors } = useTheme();
 
   return (
     <View

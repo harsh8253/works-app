@@ -1,11 +1,12 @@
-import { Colors, FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
 } from "react-native-reanimated";
 
 interface ProgressBarProps {
@@ -29,7 +30,7 @@ export default function ProgressBar({
   style,
   animated = true,
 }: ProgressBarProps) {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const animatedWidth = useSharedValue(0);
 
   useEffect(() => {

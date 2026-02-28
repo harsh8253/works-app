@@ -1,6 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -17,6 +20,15 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Firebase Auth
+const auth = getAuth(app);
+
+// Initialize Cloud Firestore
+const db = getFirestore(app);
+
+// Initialize Cloud Storage
+const storage = getStorage(app);
+
 // Analytics — only supported on web, not in React Native
 let analytics: ReturnType<typeof getAnalytics> | null = null;
 isSupported().then((supported) => {
@@ -25,5 +37,5 @@ isSupported().then((supported) => {
   }
 });
 
-export { analytics, app };
+export { analytics, app, auth, db, storage };
 export default app;

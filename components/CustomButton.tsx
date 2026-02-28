@@ -1,23 +1,23 @@
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import React from "react";
 import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TextStyle,
-  TouchableOpacity,
-  ViewStyle,
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TextStyle,
+    TouchableOpacity,
+    ViewStyle,
 } from "react-native";
 import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
 } from "react-native-reanimated";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -48,7 +48,7 @@ export default function CustomButton({
   fullWidth = false,
 }: CustomButtonProps) {
   const scale = useSharedValue(1);
-  const colors = Colors.dark;
+  const { colors } = useTheme();
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

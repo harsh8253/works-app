@@ -1,22 +1,25 @@
+import TaskActions from "@/components/TaskActions";
 import TaskCard from "@/components/TaskCard";
-import { tasks } from "@/constants/mockData";
+import { db } from "@/constants/firebase";
+import { Task } from "@/constants/mockData";
 import {
-  BorderRadius,
-  Colors,
-  FontSize,
-  FontWeight,
-  Spacing,
+    BorderRadius,
+    FontSize,
+    FontWeight,
+    Spacing,
 } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { collection, onSnapshot, query } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -24,11 +27,32 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type TabFilter = "all" | "todo" | "in-progress" | "done";
 
 export default function TaskListScreen() {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [actionTaskId, setActionTaskId] = useState<string | null>(null);
+  const [actionMode, setActionMode] = useState<"edit" | "assign" | "support" | null>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, "tasks"));
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedTasks = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Task)
+        );
+        fetchedTasks.sort((a: any, b: any) => (b.createdAt || 0) - (a.createdAt || 0));
+        setTasks(fetchedTasks);
+      },
+      (error) => {
+        console.error("Error fetching tasks:", error);
+      }
+    );
+    return unsub;
+  }, []);
 
   const tabs: { key: TabFilter; label: string }[] = [
     { key: "all", label: "All" },
@@ -174,6 +198,9 @@ export default function TaskListScreen() {
               <TaskCard
                 task={task}
                 onPress={() => router.push(`/task-detail?id=${task.id}` as any)}
+                onEdit={() => { setActionTaskId(task.id); setActionMode("edit"); }}
+                onAssign={() => { setActionTaskId(task.id); setActionMode("assign"); }}
+                onSupport={() => { setActionTaskId(task.id); setActionMode("support"); }}
               />
             </Animated.View>
           ))
@@ -188,6 +215,12 @@ export default function TaskListScreen() {
       >
         <Ionicons name="add" size={24} color="#FFFFFF" />
       </TouchableOpacity>
+
+      <TaskActions
+        taskId={actionTaskId}
+        mode={actionMode}
+        onClose={() => { setActionTaskId(null); setActionMode(null); }}
+      />
     </View>
   );
 }

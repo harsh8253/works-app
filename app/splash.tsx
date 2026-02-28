@@ -1,17 +1,18 @@
-import { Colors, FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { FontSize, FontWeight, Spacing } from "@/constants/theme";
+import { useTheme } from "@/constants/ThemeContext";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withTiming,
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withTiming,
 } from "react-native-reanimated";
 
 export default function SplashScreen() {
-  const colors = Colors.dark;
+  const { colors } = useTheme();
   const router = useRouter();
 
   const logoOpacity = useSharedValue(0);
