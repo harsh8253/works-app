@@ -123,9 +123,18 @@ export default function TaskCard({
           style,
         ]}
       >
-        <Text style={[styles.compactTitle, { color: colors.text }]} numberOfLines={1}>
-          {task.title}
-        </Text>
+        <View style={styles.compactHeader}>
+          <Text style={[styles.compactTitle, { color: colors.text, flex: 1 }]} numberOfLines={1}>
+            {task.title}
+          </Text>
+          <TouchableOpacity
+            onPress={handleLongPress}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={styles.menuBtn}
+          >
+            <Ionicons name="ellipsis-vertical" size={16} color={colors.textMuted} />
+          </TouchableOpacity>
+        </View>
         <View style={styles.compactFooter}>
           <PriorityBadge priority={task.priority} size="sm" />
           <AvatarGroup avatars={task.assignees || []} size={20} maxDisplay={2} />
@@ -150,9 +159,16 @@ export default function TaskCard({
       ]}
     >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+        <Text style={[styles.title, { color: colors.text, flex: 1 }]} numberOfLines={2}>
           {task.title}
         </Text>
+        <TouchableOpacity
+          onPress={handleLongPress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.menuBtn}
+        >
+          <Ionicons name="ellipsis-vertical" size={18} color={colors.textMuted} />
+        </TouchableOpacity>
       </View>
       <Text style={[styles.description, { color: colors.textTertiary }]} numberOfLines={2}>
         {task.description}
@@ -179,8 +195,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: Spacing.sm,
   },
-  header: { marginBottom: Spacing.xs },
+  header: { flexDirection: "row", alignItems: "flex-start", marginBottom: Spacing.xs },
   title: { fontSize: FontSize.md, fontWeight: FontWeight.medium, lineHeight: 20 },
+  menuBtn: {
+    width: 28,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: Spacing.xs,
+    marginTop: -2,
+  },
   description: { fontSize: FontSize.sm, lineHeight: 18, marginBottom: Spacing.md },
   badgeRow: { flexDirection: "row", alignItems: "center", marginBottom: Spacing.md },
   footer: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
@@ -192,6 +216,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: Spacing.sm,
   },
-  compactTitle: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, marginBottom: Spacing.sm },
+  compactHeader: { flexDirection: "row", alignItems: "center", marginBottom: Spacing.sm },
+  compactTitle: { fontSize: FontSize.sm, fontWeight: FontWeight.medium },
   compactFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
 });
