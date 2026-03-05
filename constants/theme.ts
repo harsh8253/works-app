@@ -1,12 +1,12 @@
 import { Platform } from "react-native";
 
-// SprintFlow Design System – Minimal Zinc + Violet
+// SprintFlow Design System – Minimal Zinc + Blue
 export const Colors = {
   dark: {
-    primary: "#8B5CF6",
-    primaryLight: "#A78BFA",
-    primaryDark: "#7C3AED",
-    primaryMuted: "rgba(139, 92, 246, 0.12)",
+    primary: "#3B82F6",
+    primaryLight: "#60A5FA",
+    primaryDark: "#2563EB",
+    primaryMuted: "rgba(59, 130, 246, 0.12)",
     background: "#09090B",
     surface: "#18181B",
     surfaceLight: "#1F1F23",
@@ -31,16 +31,16 @@ export const Colors = {
     overlay: "rgba(0, 0, 0, 0.6)",
     shadow: "rgba(0, 0, 0, 0.4)",
     tabIconDefault: "#52525B",
-    tabIconSelected: "#A78BFA",
-    tint: "#8B5CF6",
+    tabIconSelected: "#60A5FA",
+    tint: "#3B82F6",
     icon: "#71717A",
     glass: "rgba(24, 24, 27, 0.85)",
   },
   light: {
-    primary: "#7C3AED",
-    primaryLight: "#8B5CF6",
-    primaryDark: "#6D28D9",
-    primaryMuted: "rgba(124, 58, 237, 0.08)",
+    primary: "#2563EB",
+    primaryLight: "#3B82F6",
+    primaryDark: "#1D4ED8",
+    primaryMuted: "rgba(37, 99, 235, 0.08)",
     background: "#FAFAFA",
     surface: "#FFFFFF",
     surfaceLight: "#F4F4F5",
@@ -65,8 +65,8 @@ export const Colors = {
     overlay: "rgba(0, 0, 0, 0.3)",
     shadow: "rgba(0, 0, 0, 0.06)",
     tabIconDefault: "#A1A1AA",
-    tabIconSelected: "#7C3AED",
-    tint: "#7C3AED",
+    tabIconSelected: "#2563EB",
+    tint: "#2563EB",
     icon: "#71717A",
     glass: "rgba(255, 255, 255, 0.9)",
   },
