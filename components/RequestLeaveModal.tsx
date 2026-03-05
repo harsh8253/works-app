@@ -14,6 +14,7 @@ import { Colors, Spacing, BorderRadius, FontSize, FontWeight } from "@/constants
 import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "./CustomButton";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface RequestLeaveModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ interface RequestLeaveModalProps {
 export const RequestLeaveModal: React.FC<RequestLeaveModalProps> = ({ visible, onClose }) => {
   const { isDark } = useTheme();
   const colors = isDark ? Colors.dark : Colors.light;
+  const insets = useSafeAreaInsets();
 
   const [leaveType, setLeaveType] = useState("Annual Leave");
   const [startDate, setStartDate] = useState("2026-03-25");
@@ -38,39 +40,67 @@ export const RequestLeaveModal: React.FC<RequestLeaveModalProps> = ({ visible, o
     >
       <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.keyboardView}
         >
-          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+          <View 
+            style={[
+              styles.modalContent, 
+              { 
+                backgroundColor: colors.background,
+                paddingBottom: Platform.OS === "ios" ? insets.bottom + Spacing.lg : Spacing.xl 
+              }
+            ]}
+          >
+            <View style={styles.dragIndicatorContainer}>
+              <View style={[styles.dragIndicator, { backgroundColor: colors.border }]} />
+            </View>
+
             <View style={styles.header}>
               <Text style={[styles.title, { color: colors.text }]}>Request Leave</Text>
-              <TouchableOpacity onPress={onClose}>
-                <Ionicons name="close" size={24} color={colors.textSecondary} />
+              <TouchableOpacity 
+                onPress={onClose}
+                style={[styles.closeBtn, { backgroundColor: colors.surfaceLight }]}
+              >
+                <Ionicons name="close" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={styles.form} showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              contentContainerStyle={styles.form} 
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
               <Text style={[styles.label, { color: colors.textSecondary }]}>Leave Type</Text>
-              <View style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Text style={{ color: colors.text }}>{leaveType}</Text>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              >
+                <Text style={{ color: colors.text, fontSize: FontSize.md }}>{leaveType}</Text>
                 <Ionicons name="chevron-down" size={20} color={colors.textTertiary} />
-              </View>
+              </TouchableOpacity>
 
               <View style={styles.row}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.label, { color: colors.textSecondary }]}>From Date</Text>
-                  <View style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    <Text style={{ color: colors.text }}>{startDate}</Text>
+                  <TouchableOpacity 
+                    activeOpacity={0.7}
+                    style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  >
+                    <Text style={{ color: colors.text, fontSize: FontSize.md }}>{startDate}</Text>
                     <Ionicons name="calendar-outline" size={18} color={colors.textTertiary} />
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 <View style={{ width: Spacing.md }} />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.label, { color: colors.textSecondary }]}>To Date</Text>
-                  <View style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    <Text style={{ color: colors.text }}>{endDate}</Text>
+                  <TouchableOpacity 
+                    activeOpacity={0.7}
+                    style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  >
+                    <Text style={{ color: colors.text, fontSize: FontSize.md }}>{endDate}</Text>
                     <Ionicons name="calendar-outline" size={18} color={colors.textTertiary} />
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -78,23 +108,30 @@ export const RequestLeaveModal: React.FC<RequestLeaveModalProps> = ({ visible, o
               <TextInput
                 style={[
                   styles.textArea,
-                  { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }
+                  { 
+                    backgroundColor: colors.surface, 
+                    borderColor: colors.border, 
+                    color: colors.text,
+                    fontSize: FontSize.md
+                  }
                 ]}
                 placeholder="Briefly explain your reason..."
                 placeholderTextColor={colors.textMuted}
                 multiline
-                numberOfLines={4}
+                numberOfLines={3}
                 value={reason}
                 onChangeText={setReason}
               />
 
-              <CustomButton
-                title="Submit Request"
-                onPress={onClose}
-                fullWidth
-                size="lg"
-                style={{ marginTop: Spacing.xl }}
-              />
+              <View style={styles.footer}>
+                <CustomButton
+                  title="Submit Request"
+                  onPress={onClose}
+                  fullWidth
+                  size="lg"
+                  style={styles.submitBtn}
+                />
+              </View>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -114,8 +151,17 @@ const styles = StyleSheet.create({
   modalContent: {
     borderTopLeftRadius: BorderRadius.xxl,
     borderTopRightRadius: BorderRadius.xxl,
-    padding: Spacing.lg,
-    maxHeight: "90%",
+    paddingHorizontal: Spacing.lg,
+    maxHeight: "95%",
+  },
+  dragIndicatorContainer: {
+    alignItems: "center",
+    paddingVertical: Spacing.md,
+  },
+  dragIndicator: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
   },
   header: {
     flexDirection: "row",
@@ -127,17 +173,25 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
   },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   form: {
-    paddingBottom: Spacing.xxxl,
+    paddingBottom: Spacing.md,
   },
   label: {
-    fontSize: FontSize.xs,
+    fontSize: 12,
     fontWeight: FontWeight.bold,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
     textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   input: {
-    height: 50,
+    height: 52,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     paddingHorizontal: Spacing.md,
@@ -154,7 +208,14 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     padding: Spacing.md,
-    height: 100,
+    height: 90,
     textAlignVertical: "top",
+    marginBottom: Spacing.lg,
+  },
+  footer: {
+    marginTop: Spacing.sm,
+  },
+  submitBtn: {
+    height: 56,
   },
 });

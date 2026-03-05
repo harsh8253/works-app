@@ -13,6 +13,7 @@ import {
 import React, { useState } from "react";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -82,17 +83,35 @@ export default function LoginScreen() {
             entering={FadeIn.duration(500)}
             style={styles.logoSection}
           >
-            <Text style={styles.logoText}>
-              sprint
-              <Text
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: Spacing.sm,
+              }}
+            >
+              <Image
+                source={require("@/assets/images/icon.png")}
                 style={{
-                  color: colors.primary,
-                  fontWeight: FontWeight.semibold,
+                  width: 48,
+                  height: 48,
+                  marginRight: Spacing.sm,
+                  borderRadius: BorderRadius.md,
                 }}
-              >
-                flow
+                resizeMode="contain"
+              />
+              <Text style={styles.logoText}>
+                sprint
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontWeight: FontWeight.semibold,
+                  }}
+                >
+                  flow
+                </Text>
               </Text>
-            </Text>
+            </View>
             <Text style={[styles.welcomeText, { color: colors.textTertiary }]}>
               Sign in to your workspace
             </Text>
@@ -256,7 +275,6 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.regular,
     color: "#FAFAFA",
     letterSpacing: -1.5,
-    marginBottom: Spacing.sm,
   },
   welcomeText: {
     fontSize: FontSize.md,
