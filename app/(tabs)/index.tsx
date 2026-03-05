@@ -11,12 +11,14 @@ import {
 import { useTheme } from "@/constants/ThemeContext";
 import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadows } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 export default function DashboardScreen() {
   const { isDark } = useTheme();
   const colors = isDark ? Colors.dark : Colors.light;
+  const router = useRouter();
 
   return (
     <ScrollView 
@@ -30,7 +32,10 @@ export default function DashboardScreen() {
           <Text style={[styles.greeting, { color: colors.textSecondary }]}>Good Morning,</Text>
           <Text style={[styles.userName, { color: colors.text }]}>John Doe</Text>
         </View>
-        <TouchableOpacity style={[styles.notificationBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <TouchableOpacity 
+          style={[styles.notificationBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          onPress={() => router.push("/notifications")}
+        >
           <Ionicons name="notifications-outline" size={24} color={colors.text} />
           <View style={[styles.notificationBadge, { backgroundColor: colors.danger }]} />
         </TouchableOpacity>
