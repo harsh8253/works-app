@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { Colors, Spacing, BorderRadius, FontSize, FontWeight } from "@/constants/theme";
 import { useTheme } from "@/constants/ThemeContext";
@@ -48,7 +47,7 @@ export const RequestLeaveModal: React.FC<RequestLeaveModalProps> = ({ visible, o
               styles.modalContent, 
               { 
                 backgroundColor: colors.background,
-                paddingBottom: Platform.OS === "ios" ? insets.bottom + Spacing.lg : Spacing.xl 
+                paddingBottom: insets.bottom + Spacing.xxl,
               }
             ]}
           >
@@ -66,11 +65,7 @@ export const RequestLeaveModal: React.FC<RequestLeaveModalProps> = ({ visible, o
               </TouchableOpacity>
             </View>
 
-            <ScrollView 
-              contentContainerStyle={styles.form} 
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-            >
+            <View style={styles.form}>
               <Text style={[styles.label, { color: colors.textSecondary }]}>Leave Type</Text>
               <TouchableOpacity 
                 activeOpacity={0.7}
@@ -132,7 +127,7 @@ export const RequestLeaveModal: React.FC<RequestLeaveModalProps> = ({ visible, o
                   style={styles.submitBtn}
                 />
               </View>
-            </ScrollView>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </View>
@@ -152,7 +147,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: BorderRadius.xxl,
     borderTopRightRadius: BorderRadius.xxl,
     paddingHorizontal: Spacing.lg,
-    maxHeight: "95%",
   },
   dragIndicatorContainer: {
     alignItems: "center",
@@ -181,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   form: {
-    paddingBottom: Spacing.md,
+    paddingBottom: Spacing.lg,
   },
   label: {
     fontSize: 12,

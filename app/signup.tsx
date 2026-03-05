@@ -13,6 +13,7 @@ import {
 import React, { useState } from "react";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -88,17 +89,35 @@ export default function SignupScreen() {
             entering={FadeIn.duration(500)}
             style={styles.logoSection}
           >
-            <Text style={styles.logoText}>
-              sprint
-              <Text
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: Spacing.sm,
+              }}
+            >
+              <Image
+                source={require("@/assets/images/ciright.png")}
                 style={{
-                  color: colors.primary,
-                  fontWeight: FontWeight.semibold,
+                  width: 48,
+                  height: 48,
+                  marginRight: Spacing.sm,
+                  borderRadius: BorderRadius.lg,
                 }}
-              >
-                flow
+                resizeMode="contain"
+              />
+              <Text style={styles.logoText}>
+                ciright
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontWeight: FontWeight.semibold,
+                  }}
+                >
+                  HRM
+                </Text>
               </Text>
-            </Text>
+            </View>
             <Text style={[styles.welcomeText, { color: colors.textTertiary }]}>
               Create your account
             </Text>

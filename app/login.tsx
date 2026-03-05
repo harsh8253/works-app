@@ -91,24 +91,24 @@ export default function LoginScreen() {
               }}
             >
               <Image
-                source={require("@/assets/images/icon.png")}
+                source={require("@/assets/images/ciright.png")}
                 style={{
                   width: 48,
                   height: 48,
                   marginRight: Spacing.sm,
-                  borderRadius: BorderRadius.md,
+                  borderRadius: BorderRadius.lg,
                 }}
                 resizeMode="contain"
               />
               <Text style={styles.logoText}>
-                sprint
+                ciright
                 <Text
                   style={{
                     color: colors.primary,
                     fontWeight: FontWeight.semibold,
                   }}
                 >
-                  flow
+                  HRM
                 </Text>
               </Text>
             </View>
@@ -237,7 +237,7 @@ export default function LoginScreen() {
           {/* Footer Link */}
           <View style={styles.footerLink}>
             <Text style={{ color: colors.textMuted }}>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
             </Text>
             <TouchableOpacity onPress={() => router.push("/signup" as any)}>
               <Text
