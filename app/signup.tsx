@@ -6,8 +6,8 @@ import { useTheme } from "@/constants/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
 import React, { useState } from "react";
@@ -24,25 +24,31 @@ import {
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter both email and password.");
+  const handleSignup = async () => {
+    if (!email || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
       return;
     }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
+      // After signup, we might want to go to a "Success" or back to login
+      // For now, let's go to the under development screen
       router.replace("/+not-found" as any);
     } catch (error: any) {
-      Alert.alert("Login Failed", error.message);
+      Alert.alert("Signup Failed", error.message);
     }
   };
 
@@ -94,7 +100,7 @@ export default function LoginScreen() {
               </Text>
             </Text>
             <Text style={[styles.welcomeText, { color: colors.textTertiary }]}>
-              Sign in to your workspace
+              Create your account
             </Text>
           </Animated.View>
 
@@ -124,48 +130,19 @@ export default function LoginScreen() {
               onChangeText={setPassword}
             />
 
-            {/* Options */}
-            <View style={styles.optionsRow}>
-              <TouchableOpacity
-                style={styles.checkboxRow}
-                onPress={() => setRememberMe(!rememberMe)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.checkbox,
-                    {
-                      borderColor: rememberMe ? colors.primary : colors.border,
-                      backgroundColor: rememberMe
-                        ? colors.primary
-                        : "transparent",
-                    },
-                  ]}
-                >
-                  {rememberMe && (
-                    <Ionicons name="checkmark" size={12} color="#FFFFFF" />
-                  )}
-                </View>
-                <Text
-                  style={[styles.optionText, { color: colors.textTertiary }]}
-                >
-                  Remember me
-                </Text>
-              </TouchableOpacity>
+            <CustomInput
+              label="Confirm Password"
+              placeholder="••••••••"
+              icon="lock-closed-outline"
+              secureTextEntry={!showPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
 
-              <TouchableOpacity>
-                <Text
-                  style={[styles.optionText, { color: colors.textSecondary }]}
-                >
-                  Forgot password?
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Sign In */}
+            {/* Sign Up */}
             <CustomButton
-              title="Sign In"
-              onPress={handleLogin}
+              title="Sign Up"
+              onPress={handleSignup}
               fullWidth
               size="lg"
               style={{ marginTop: Spacing.xxl }}
@@ -206,28 +183,18 @@ export default function LoginScreen() {
           </Animated.View>
 
           {/* Footer */}
-          <Animated.View
-            entering={FadeIn.duration(500).delay(300)}
-            style={styles.footer}
-          >
-            <Text style={[styles.footerText, { color: colors.textMuted }]}>
-              By signing in, you agree to our Terms of Service
-            </Text>
-          </Animated.View>
-
-          {/* Footer Link */}
           <View style={styles.footerLink}>
             <Text style={{ color: colors.textMuted }}>
-              Don't have an account?{" "}
+              Already have an account?{" "}
             </Text>
-            <TouchableOpacity onPress={() => router.push("/signup" as any)}>
+            <TouchableOpacity onPress={() => router.push("/login" as any)}>
               <Text
                 style={{
                   color: colors.primary,
                   fontWeight: FontWeight.semibold,
                 }}
               >
-                Sign Up
+                Sign In
               </Text>
             </TouchableOpacity>
           </View>
@@ -262,28 +229,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
   },
   formSection: {},
-  optionsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: Spacing.xs,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: Spacing.sm,
-  },
-  optionText: {
-    fontSize: FontSize.sm,
-  },
   divider: {
     flexDirection: "row",
     alignItems: "center",
@@ -314,14 +259,6 @@ const styles = StyleSheet.create({
   socialText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
-  },
-  footer: {
-    alignItems: "center",
-    marginTop: Spacing.xxxxl,
-  },
-  footerText: {
-    fontSize: FontSize.xs,
-    textAlign: "center",
   },
   footerLink: {
     flexDirection: "row",
