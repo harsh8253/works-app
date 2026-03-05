@@ -46,7 +46,7 @@ export default function SignupScreen() {
       await createUserWithEmailAndPassword(auth, email, password);
       // After signup, we might want to go to a "Success" or back to login
       // For now, let's go to the under development screen
-      router.replace("/+not-found" as any);
+      router.replace("/(tabs)");
     } catch (error: any) {
       Alert.alert("Signup Failed", error.message);
     }
@@ -63,7 +63,7 @@ export default function SignupScreen() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      router.replace("/+not-found" as any);
+      router.replace("/(tabs)");
     } catch (error: any) {
       Alert.alert("Google Sign-In Failed", error.message);
     }

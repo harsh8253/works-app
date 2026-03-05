@@ -40,7 +40,7 @@ export default function LoginScreen() {
     }
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace("/+not-found" as any);
+      router.replace("/(tabs)");
     } catch (error: any) {
       Alert.alert("Login Failed", error.message);
     }
@@ -57,7 +57,7 @@ export default function LoginScreen() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      router.replace("/+not-found" as any);
+      router.replace("/(tabs)");
     } catch (error: any) {
       Alert.alert("Google Sign-In Failed", error.message);
     }
