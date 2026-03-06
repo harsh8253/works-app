@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "cirightHRM",
-    "slug": "cirightHRM",
+    "slug": "cirighthrm",
     "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/ciright.png",
@@ -52,7 +52,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4db142fa-7fbd-43cf-a6f7-b46ab3ab608e"
+        "projectId": "8856554c-0067-48da-a4c1-9fa952c64d05"
       }
     }
   }
